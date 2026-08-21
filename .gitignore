@@ -1,3 +1,25 @@
+## MS OFFICE
+# Word temporary files
+~$*.doc*
+~$*.dot*
+~$*.docm
+Backup of *.doc*
+
+# Excel temporary files
+~$*.xls*
+*.xlk
+
+# PowerPoint temporary files
+~$*.ppt*
+
+# Visio autosave temporary files
+*.~vsd*
+
+# Generic Office/Windows temp files
+*.tmp
+
+## PYTHON
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
