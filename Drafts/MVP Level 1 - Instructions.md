@@ -44,23 +44,27 @@ If the required upstream context is missing, contradictory, or too thin to safel
 
 ## MVP Feature Selection
 
-From the Methods and Settings Plan, choose only a few features for MVP Level 1. Be conservative. Prefer features that:
+From the Methods and Settings Plan, choose only a few features for MVP Level 1. Be conservative about scope, but not timid about useful, documented device writes. In most cases, a useful MVP should include both reads/queries and a small number of safe, reversible settings writes or method calls that prove the package can actually control the device, not merely observe it.
+
+Prefer MVP features that:
 
 1. directly support the scientist’s primary goals;
 
-2. are safe, documented, and low risk;
+2. are documented, useful, and low enough risk to test responsibly;
 
-3. are easy to verify, especially read/query commands or set/get pairs;
+3. are easy to verify, especially read/query commands, method calls with observable outcomes, or set/get pairs;
 
 4. establish reusable scaffolding for later full implementation;
 
 5. inspect current state before changing it;
 
-6. produce clear evidence of success or failure.
+6. restore any demonstration-only setting changes and clearly document the before/set/readback/restore evidence;
 
-Good MVP candidates often include identity/version/status queries, error/status inspection, a safe configuration read, one low-risk set/get pair, one core measurement/acquisition/readout needed for the science goal, and structured connection/session handling. Defer ambitious features such as broad acquisition automation, calibration changes, firmware/service functions, streaming pipelines, destructive writes, irreversible settings, undocumented commands, and complex multi-instrument synchronization unless the user explicitly authorizes them and upstream evidence strongly supports them.
+7. avoid settings or method calls that could brick, damage, recalibrate, corrupt, or leave the device in an unsafe or hard-to-recover state.
 
-When choosing among candidate features, explain the tradeoff between scientist-goal value, ease of verification, and foundation value for later expansion. Do not implement the entire methods/settings plan in this step.
+Good MVP candidates often include identity/version/status queries, error/status inspection, a safe configuration read, one or more low-risk set/get pairs, safe method calls that exercise real control paths, one core measurement/acquisition/readout needed for the science goal, and structured connection/session handling. Do not shy away from settings writes or method calls simply because earlier stages were read-focused; use them strategically when they are documented, reversible or otherwise safe, useful for the science goal, and verifiable. Defer ambitious features such as broad acquisition automation, calibration changes, firmware/service functions, destructive writes, irreversible settings, undocumented commands, and complex multi-instrument synchronization unless the user explicitly authorizes them and upstream evidence strongly supports them.
+
+When choosing among candidate features, explain the tradeoff between scientist-goal value, write/read safety, ease of verification, and foundation value for later expansion. Do not implement the entire methods/settings plan in this step.
 
 ## Core Workflow
 
@@ -123,8 +127,12 @@ For each MVP implementation request:
    - Include clear startup output, feature-by-feature result reporting, structured success/failure classification, exception handling, and nonzero exit on failure.
    
    - Avoid hard-coded secrets and avoid dumping excessive raw device data.
-   
-   - Do not perform unsafe, destructive, undocumented, calibration-affecting, firmware/service, or broad configuration actions.
+     
+     - Include useful documented settings writes and method calls when they are part of the selected MVP feature set, can be tested responsibly, and have clear evidence criteria.
+     
+     - For any demonstration-only setting change, read the current value first, write the test value, read back and classify the result, then restore the original value before exit when safe and possible.
+     
+     - Do not perform unsafe, destructive, undocumented, calibration-affecting, firmware/service, irreversible, device-bricking, or broad configuration actions.
 
 6. **Demonstrate efficacy for a human supervisor**
    
@@ -138,7 +146,7 @@ For each MVP implementation request:
    
    - Any setting changed solely to demonstrate efficacy must be restored to its original value before the demo exits, unless restoration is impossible or unsafe. If restoration fails, mark the result clearly and report the blocker or safety caveat.
    
-   - Prefer reversible, low-risk settings for set/get demonstrations. Avoid settings that affect calibration, firmware, service state, irreversible device state, or experiment-critical state.
+   - Prefer reversible, low-risk settings for set/get demonstrations. Prefer reversible, low-risk settings for set/get demonstrations, but do include such writes when they make the MVP more useful and prove real control capability. Avoid settings that affect calibration, firmware, service state, irreversible device state, device-bricking behavior, or experiment-critical state.
    
    - Separate success evidence into machine-readable results and human-readable artifacts. Do not rely only on terminal output when images, summaries, or before/after evidence would communicate success better.
 
@@ -449,7 +457,7 @@ Use Memory only for durable lessons that should help future runs by the same use
 
 - Do not continue when the device connection is broken; bail out and explain the blocker.
 
-- Do not install core drivers/libraries, change interfaces, update firmware, alter calibration, or perform unsafe writes unless explicitly authorized and supported by upstream evidence.
+- Do not install core drivers/libraries, change interfaces, update firmware, alter calibration, or perform unsafe writes unless explicitly authorized and supported by upstream evidence. Safe, documented, reversible settings writes and method calls are in scope for MVP Level 1 when they are useful, strategically selected, verified with readback or observable evidence, and restored when they are demonstration-only changes.
 
 - Do not use unofficial examples or broad web search as a substitute for the official programming references and upstream pipeline outputs.
 

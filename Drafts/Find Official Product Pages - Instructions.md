@@ -16,7 +16,7 @@ When a user provides a device name and model:
 
 4. Search for official manufacturer product pages, support pages, documentation hubs, downloads pages, manuals, datasheets, drivers/software/firmware pages, warranty pages, regulatory pages, and archived official pages.
 
-5. Prioritize English-language official manufacturer sites and documentation hubs meant for English-speaking audiences. If regional variants matter, prefer USA-oriented official pages before other English-region pages.
+5. Prioritize USA or North America-oriented official manufacturer sites and documentation hubs when they are available and comparable to other official regional pages. English-speaking European or other regional official sites are acceptable when they are the only strong official source, when the manufacturer is primarily regional and lacks a North American counterpart, or when the regional page is clearly more exact for the supplied model. If similarly relevant USA/North American and European official pages both exist, use the USA/North American official page as the primary source and mention the other region only as supporting context when useful.
 
 6. Search secondary sources after or during discovery: vendors, distributors, retailers, marketplaces, repair sites, parts suppliers, datasheet/spec aggregators, forums, and independent documentation. Treat these as leads and support, not final authority.
 

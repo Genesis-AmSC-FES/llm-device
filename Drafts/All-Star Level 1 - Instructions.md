@@ -78,7 +78,7 @@ Use MVP Level 1 as the primary architectural and behavioral model. Build on its 
 
 - any proven device-response parsing or normalization.
 
-Then expand toward the full Methods and Settings Plan. Implement as many planned safe methods/settings as can be responsibly supported from official documentation and upstream evidence. Favor broad coverage with clear guards and documented limitations over unsafe or speculative completeness.
+Then expand toward the full Methods and Settings Plan. Implement as many planned safe methods/settings as can be responsibly supported from official documentation and upstream evidence. Be broad in coverage, and do not shy away from useful settings writes or method calls simply because earlier stages were read-focused. Safe, documented, reversible writes are valuable when they prove real device control, exercise the reusable package, support the scientist’s goals, and can be verified with readback or observable evidence. Favor broad coverage with clear guards and documented limitations over unsafe or speculative completeness.
 
 Group the implementation into coherent capability areas such as:
 
@@ -100,7 +100,7 @@ Group the implementation into coherent capability areas such as:
 
 9. guarded or deferred methods for hazardous, calibration-affecting, destructive, firmware/service, or undocumented operations.
 
-Do not blindly implement every documented command as an executable action. For risky operations, include explicit guardrails, dry-run descriptions, stubs that raise clear `NotImplementedError` or `SafetyBlockedError`, or documented defer notes rather than unsafe device-changing code.
+Do not blindly implement every documented command as an executable action. For safe and useful settings, prefer real set/get implementations with before-value capture, requested set value, readback verification, and restoration when the change is demonstration-only. For risky operations, include explicit guardrails, dry-run descriptions, stubs that raise clear `NotImplementedError` or `SafetyBlockedError`, or documented defer notes rather than unsafe device-changing code.
 
 ## Core Workflow
 
@@ -186,7 +186,7 @@ For each All-Star Level 1 implementation request:
    
    - Any setting changed solely to demonstrate efficacy must be restored to its original value before the demo exits, unless restoration is impossible or unsafe. If restoration fails, mark the result clearly and report the blocker or safety caveat.
    
-   - Prefer reversible, low-risk settings for set/get demonstrations. Avoid settings that affect calibration, firmware, service state, irreversible device state, or experiment-critical state.
+   - Prefer reversible, low-risk settings for set/get demonstrations, and include those writes when they make the All-Star package more useful or prove real control capability. Avoid settings that affect calibration, firmware, service state, irreversible device state, device-bricking behavior, or experiment-critical state.
    
    - Include plain-language notes that help a lab-domain reader understand what the returned values, plots, summaries, or readbacks mean scientifically or operationally.
    
@@ -250,7 +250,7 @@ In chat, return only:
 
 - **Human-supervisor evidence created**: plots, output images, settings summaries, before/set/after/readback/restore demonstrations, and physical-device verification notes when applicable.
 
-- ****Human-readable result summary**: a concise but confidence-building statement of whether the package and demo worked, what was actually tested, what evidence proves it, and any remaining caveats.
+- **Human-readable result summary**: a concise but confidence-building statement of whether the package and demo worked, what was actually tested, what evidence proves it, and any remaining caveats.
 
 - **Files created / file-ready outputs**: list the artifacts, including the reusable package, `demo_of_efficacy.py`, `package-usage-guide.md`, documentation, JSON handoff, and any plots, settings summaries, CSVs, or wrappers.
 
@@ -524,7 +524,7 @@ Use Memory only for durable lessons that should help future runs by the same use
 
 - Do not continue when the device connection is broken; bail out and explain the blocker.
 
-- Do not install core drivers/libraries, change interfaces, update firmware, alter calibration, bypass interlocks, or perform unsafe writes unless explicitly authorized and supported by upstream evidence.
+- Do not install core drivers/libraries, change interfaces, update firmware, alter calibration, bypass interlocks, or perform unsafe writes unless explicitly authorized and supported by upstream evidence. Safe, documented, reversible settings writes and method calls are in scope when they are useful, covered by the plan or official documentation, verified with readback or observable evidence, and restored when they are demonstration-only changes.
 
 - Do not use unofficial examples or broad web search as a substitute for official programming references and upstream pipeline outputs.
 
