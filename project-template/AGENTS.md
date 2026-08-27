@@ -1,6 +1,6 @@
 # Device Pipeline Agent Guide
 
-> **AI authorship:** This file was written by Codex, an AI coding agent from OpenAI.
+> **AI authorship:** This file was written by OpenAI Codex (model/version/variant/mode unavailable in the creating runtime).
 
 ## What this workspace is
 
@@ -79,12 +79,12 @@ Do not redo completed stages merely to derive their conclusions again. Use their
 
 ### AI-authorship notice
 
-Every artifact created or materially rewritten by an AI agent must identify itself as AI-generated and name the product/agent, provider, and the most specific model identity actually exposed by the runtime. Include the exact model identifier plus any relevant variant, size, reasoning profile, or speed/mode label when available, while keeping the notice short. For example: `OpenAI Codex (gpt-5.6-sol, default fast)` or `Anthropic Claude Code (5.2 mini)`. Use runtime metadata rather than inferring identity from behavior, capabilities, dates, or examples in this guide. Never guess a model, version, variant, or mode. If exact model metadata is unavailable, say so explicitly, for example: `OpenAI Codex (model unavailable)`, rather than silently using only the generic product name.
+Every artifact created or materially rewritten by an AI agent must identify itself as AI-generated and name the product/agent, provider, and the most specific model identity actually exposed by the runtime. The stamp must preserve the full runtime-provided label, including the exact model/version, variant, size, reasoning profile, and speed/mode when exposed—for example, `OpenAI Codex (gpt-5.6-luna, medium, fast)`—rather than shortening it to a generic label such as `GPT5`, `Codex`, or `Claude Code`. If the runtime exposes model and mode as separate fields, combine all of them in the stamp. Use runtime metadata rather than inferring identity from behavior, capabilities, dates, or examples in this guide. Never guess a model, version, variant, or mode. If a particular field is not exposed, mark that field `unavailable`; do not replace a detailed available label with a generic product name.
 
 Keep the notice compatible with the file format:
 
 - Markdown or plain text: put a short visible notice immediately below the title or at the top.
-- JSON: add a top-level `_ai_generation` object containing at least `ai_generated: true`, `agent`, `provider`, and `model`; add a `variant` or `mode` field when exposed by the runtime. Use `"unavailable"` for model metadata the runtime does not expose.
+- JSON: add a top-level `_ai_generation` object containing at least `ai_generated: true`, `agent`, `provider`, and the exact `model` label exposed by the runtime; add `variant`, `size`, `reasoning`, and/or `mode` fields when exposed. Preserve detailed labels such as `gpt-5.6-luna medium fast`; never normalize them to a generic label. Use `"unavailable"` only for individual metadata fields the runtime does not expose.
 - CSV: add `ai_generated_by`, `ai_provider`, and `ai_model` columns, plus `ai_variant` or `ai_mode` when available.
 - Source code, scripts, and configuration files that support comments: add a comment header.
 - Other structured formats: use a native metadata field or comment without making the file invalid.
