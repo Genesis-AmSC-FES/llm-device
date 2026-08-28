@@ -145,7 +145,13 @@ If that task has no dedicated instruction file:
 
 ## Completion checklist
 
-Before declaring a stage complete, confirm:
+### Check your work before finishing
+
+Before declaring any stage complete, re-read the active stage instruction file from beginning to end. Then compare the finished work against every objective, workflow requirement, required deliverable, filename, schema, evidence rule, user-interaction requirement, safety constraint, and chat-output requirement in that file. Do not rely on memory, a prior summary, or the existence of plausible output files.
+
+Audit the actual generated artifacts and observed evidence, not just the plan or code surface. Run the required demos, tests, validation commands, and live-device checks when the instructions call for them. Confirm that documentation and machine-readable handoffs agree with what was actually executed. If any requirement is unmet, finish it before proceeding; if it cannot be met, mark the stage accurately partial or blocked and identify the exact gap. Do not call a stage complete merely because its main code path works.
+
+Only after that re-read and audit, confirm:
 
 - The stage objective was achieved, or the result is accurately marked partial/blocked.
 - Required user interaction or acceptance occurred.

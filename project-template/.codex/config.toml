@@ -1,0 +1,119 @@
+# Written by OpenAI Codex (GPT-5) on 2026-08-27.
+# Codex CLI configuration for local scientific-instrument projects.
+#
+# PURPOSE
+# - Codex may modify files inside the active workspace (the folder where you
+#   start Codex), but it does not receive general write access elsewhere.
+# - Codex may communicate with USB, USBTMC, serial, Video4Linux, Ethernet
+#   instruments, and GigE Vision cameras.
+# - If a necessary command exceeds these normal permissions (for example, a
+#   system-level sudo command), Codex submits the exact command to its automatic
+#   approval reviewer instead of routinely interrupting you or telling you to
+#   copy and paste the command yourself.
+#
+# PROJECT-SCOPED INSTALLATION (RECOMMENDED FOR THIS FILE)
+# Put this file inside the project workspace as:
+#
+#   /path/to/your/project/.codex/config.toml
+#
+# The resulting layout should look like:
+#
+#   your-project/
+#   |-- .codex/
+#   |   `-- config.toml
+#   `-- other project files...
+#
+# A file named config.toml directly in the project root will not be loaded;
+# it must be inside the project's .codex directory.
+#
+# Codex loads project-scoped configuration only after the project is marked as
+# trusted. The first time you start Codex there, accept the prompt to trust the
+# project. Project configuration is layered over any user-wide configuration
+# already present at ~/.codex/config.toml.
+#
+# STARTING CODEX
+# 1. Change into this project's root folder. This becomes the workspace that
+#    Codex is allowed to modify:
+#      cd /path/to/your/project
+# 2. If you expect sudo work, authenticate sudo locally before starting Codex:
+#      sudo -v
+#    This caches sudo authentication temporarily. Never give your password to
+#    Codex. If no sudo work is expected, skip this step.
+# 3. Start Codex normally:
+#      codex
+#
+# Codex approval and Linux sudo authentication are separate. Codex's automatic
+# reviewer evaluates requests to exceed this profile; Linux may still require
+# your local password unless `sudo -v` is still valid.
+#
+# IMPORTANT
+# Linux groups, udev rules, drivers, firewall settings, and vendor SDKs must
+# separately permit your user account to access each instrument. This profile
+# does not install drivers or bypass Linux device permissions.
+
+default_permissions = "instrument-workspace"
+
+# Let Codex request escalation when needed and have its automatic reviewer
+# evaluate the request. This greatly reduces routine approval interruptions
+# without granting permanent unrestricted access.
+approval_policy = "on-request"
+approvals_reviewer = "auto_review"
+
+# Tell the agent to submit executable escalation requests for automatic review
+# instead of delegating shell commands back for manual copy-and-paste.
+developer_instructions = """
+Work freely within the configured workspace and instrument permissions.
+When a necessary operation exceeds those permissions, request permission
+escalation so the automatic reviewer can evaluate and, when
+appropriate, authorize the exact command. Do not ask the user to copy and paste
+a command merely because it requires elevated or out-of-profile access. If an
+escalation is rejected and no safe alternative exists, explain the blocker.
+Never request, read, or retain the user's sudo password. Do not access
+third-party systems unless the user has explicitly identified them as
+authorized targets.
+"""
+
+[permissions.instrument-workspace]
+extends = ":workspace"
+
+[permissions.instrument-workspace.filesystem]
+# Raw USB devices, including devices accessed through libusb.
+"/dev/bus/usb/**" = "write"
+
+# USB Test and Measurement Class instruments.
+# Writable permission rules cannot use a wildcard such as /dev/usbtmc*.
+# Add more exact numbered nodes here if the system creates them.
+"/dev/usbtmc0" = "write"
+"/dev/usbtmc1" = "write"
+"/dev/usbtmc2" = "write"
+"/dev/usbtmc3" = "write"
+
+# USB serial and CDC serial devices. These must also be exact paths.
+"/dev/ttyUSB0" = "write"
+"/dev/ttyUSB1" = "write"
+"/dev/ttyUSB2" = "write"
+"/dev/ttyUSB3" = "write"
+"/dev/ttyACM0" = "write"
+"/dev/ttyACM1" = "write"
+"/dev/ttyACM2" = "write"
+"/dev/ttyACM3" = "write"
+
+# Video4Linux cameras and capture devices. A single physical camera may expose
+# multiple numbered video nodes, so several common nodes are included.
+"/dev/video0" = "write"
+"/dev/video1" = "write"
+"/dev/video2" = "write"
+"/dev/video3" = "write"
+"/dev/video4" = "write"
+"/dev/video5" = "write"
+"/dev/video6" = "write"
+"/dev/video7" = "write"
+
+[permissions.instrument-workspace.network]
+# Required for Ethernet instruments and GigE Vision cameras.
+enabled = true
+mode = "full"
+
+# Permit local/private-network communication and local bindings used for
+# discovery, control, and data streams.
+allow_local_binding = true

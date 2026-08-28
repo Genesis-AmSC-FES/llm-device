@@ -44,27 +44,13 @@ If the required upstream context is missing, contradictory, or too thin to safel
 
 ## MVP Feature Selection
 
-From the Methods and Settings Plan, choose only a few features for MVP Level 1. Be conservative about scope, but not timid about useful, documented device writes. In most cases, a useful MVP should include both reads/queries and a small number of safe, reversible settings writes or method calls that prove the package can actually control the device, not merely observe it.
+From the Methods and Settings Plan, choose only a few features for MVP Level 1. Be conservative about scope, but not timid about useful, documented device writes. In most cases, a useful MVP is incomplete unless it includes both reads/queries and at least one low-risk, documented, reversible live settings write or method call that proves the package can actually control the device, not merely observe it.
 
-Prefer MVP features that:
+Treat safe reversible write testing as a default proof target, not as an optional flourish. If the selected device exposes any everyday, documented, low-risk set/get candidate, build a restoration plan and test it live when the device is connected. A missing restoration plan is not a reason to avoid the write; it is a reason to make the plan by reading the current value, choosing a safe temporary value, setting it, reading it back, restoring the original value, and verifying restoration.
 
-1. directly support the scientist’s primary goals;
+Only omit live write testing when no safe, documented, reversible candidate exists; the relevant command is unavailable or undocumented; restoration is impossible or cannot be verified; the setting affects calibration, firmware, service state, persistent destructive behavior, hazardous output, motion, laser/radiation/energy emission, experiment-critical state, or device-bricking behavior; or the user or upstream safety context explicitly forbids it. In those cases, label the outcome partial or safety-blocked as appropriate and explain exactly why no safe write candidate was available.
 
-2. are documented, useful, and low enough risk to test responsibly;
-
-3. are easy to verify, especially read/query commands, method calls with observable outcomes, or set/get pairs;
-
-4. establish reusable scaffolding for later full implementation;
-
-5. inspect current state before changing it;
-
-6. restore any demonstration-only setting changes and clearly document the before/set/readback/restore evidence;
-
-7. avoid settings or method calls that could brick, damage, recalibrate, corrupt, or leave the device in an unsafe or hard-to-recover state.
-
-Good MVP candidates often include identity/version/status queries, error/status inspection, a safe configuration read, one or more low-risk set/get pairs, safe method calls that exercise real control paths, one core measurement/acquisition/readout needed for the science goal, and structured connection/session handling. Do not shy away from settings writes or method calls simply because earlier stages were read-focused; use them strategically when they are documented, reversible or otherwise safe, useful for the science goal, and verifiable. Defer ambitious features such as broad acquisition automation, calibration changes, firmware/service functions, destructive writes, irreversible settings, undocumented commands, and complex multi-instrument synchronization unless the user explicitly authorizes them and upstream evidence strongly supports them.
-
-When choosing among candidate features, explain the tradeoff between scientist-goal value, write/read safety, ease of verification, and foundation value for later expansion. Do not implement the entire methods/settings plan in this step.
+When choosing among candidate features, explain the tradeoff between scientist-goal value, write/read safety, restoration feasibility, ease of verification, and foundation value for later expansion. Do not implement the entire methods/settings plan in this step.
 
 ## Core Workflow
 
@@ -142,55 +128,34 @@ For each MVP implementation request:
    
    - If the MVP focuses on settings or configuration rather than plottable measurements, create a clear settings summary showing relevant readable settings, values, units, and status.
    
-   - For every safe set/get demonstration, capture and report: the value before setting, the exact package method or documented command/API call used to set the value, the requested set value, the readback after setting, whether the readback changed as expected, and the value after restoring the original setting.
+   - Before every live write or set/get demonstration, make a short restoration plan:
+   
+   - read the current value and record it as the restore target;
+   
+   - choose a low-risk temporary value within documented limits, preferably near the current value or otherwise benign;
+   
+   - define the exact package method or documented command/API call that will set the value;
+   
+   - define the readback or observable evidence that proves the set occurred;
+   
+   - restore the original value before exit when safe and possible;
+   
+   - verify and record the restored value.
+     If the agent is tempted to say a write would alter the user's current setup, first attempt this restoration plan. Treat inability to make or verify a safe restoration plan as the blocker, not the mere fact that state would change temporarily.
+   
+   - For every safe set/get demonstration, capture and report: the value before setting, the exact package method or documented command/API call used to set the value, the requested set value, the readback after setting, whether the readback changed as expected, the restore command or method, and the value after restoring the original setting.
    
    - Any setting changed solely to demonstrate efficacy must be restored to its original value before the demo exits, unless restoration is impossible or unsafe. If restoration fails, mark the result clearly and report the blocker or safety caveat.
    
-   - Prefer reversible, low-risk settings for set/get demonstrations. Prefer reversible, low-risk settings for set/get demonstrations, but do include such writes when they make the MVP more useful and prove real control capability. Avoid settings that affect calibration, firmware, service state, irreversible device state, device-bricking behavior, or experiment-critical state.
+   - Prefer reversible, low-risk settings for set/get demonstrations, and include such writes when they make the MVP more useful and prove real control capability. Avoid settings that affect calibration, firmware, service state, irreversible device state, device-bricking behavior, hazardous output, motion, dangerous emission, or experiment-critical state.
    
    - Separate success evidence into machine-readable results and human-readable artifacts. Do not rely only on terminal output when images, summaries, or before/after evidence would communicate success better.
-
-7. **Execute, inspect, and iterate**
    
-   - Run the demo script when the environment and connected device are available.
+   - Fake resources, mocks, simulators, and dry runs can validate code paths, but they do not prove live write capability. If only fake or simulated writes were tested, label live write validation as unproven and make the overall outcome partial unless the user explicitly asked for mock-only work.
    
-   - Also run lightweight code-quality checks that are realistic for the runtime, such as importing the package from a fresh script, running any included tests, checking syntax/compilation, and exercising package APIs through `demo_of_efficacy.py` rather than only through internal helpers.
-   
-   - Capture command used, working directory, timestamps, stdout, stderr, return code, package/library versions, connection target, selected features, observed device responses, output image paths, settings summaries, and before/set/after/restore evidence.
-   
-   - If the failure is an implementation mistake, fix the package or demo and retry.
-   
-   - If the code appears to work only because of mocked, skipped, or unexercised paths, label that clearly and do not claim device verification.
-   
-   - If the failure points to missing hardware, disconnected device, missing driver/library, wrong permissions, unavailable connection target, unsafe state, or missing official documentation, stop and report the blocker.
-   
-   - Make a bounded number of targeted fixes. Do not retry indefinitely or broaden into unrelated discovery.
+   - If no live write was attempted, include a prominent caveat in the run summary and chat result: "Package write methods were not validated against the live device." Explain whether this was due to safety, missing documentation, missing connection, missing write candidate, or user constraints.
 
-8. **Produce pipeline outputs**
-   
-   - Produce the reusable package, demo script, documentation, human-readable run summary, executive summary, output images or settings summaries when applicable, and machine-readable handoff outputs described below.
-   
-   - If file creation is available, create downloadable artifacts. If not, provide file-ready sections inline.
-
-## Default Deliverables
-
-When the task can be completed or meaningfully attempted, create these outputs:
-
-1. A reusable Python package directory for the device-facing implementation, preferably named for the device and falling back to `device_mvp/` when needed.
-
-2. `demo_of_efficacy.py` — the separate demo script that imports the package, demonstrates the MVP feature set, creates plots or settings summaries, and records before/set/after/restore evidence.
-
-3. `mvp-level-1-plan.md` — scientist-readable plan describing chosen MVP features, why they were selected, implementation approach, package/demo separation, preconditions, and expected success evidence.
-
-4. `mvp-level-1-run-summary.md` — human-readable summary of what ran, what each feature returned, what plots or settings summaries were created, what settings were changed and restored, what worked, and what failed.
-
-5. `mvp-level-1-output.json` — strict machine-readable handoff for later pipeline steps.
-
-6. `package-usage-guide.md` — human-readable instructions for domain scientists, graduate students, lab technicians, or supervisors who want to import the package and use it in their own scripts. Include how to activate or recreate the relevant Python environment or virtual environment, install any needed package requirements, set connection targets or environment variables, run a minimal import/check example, call the main package APIs, safely read settings/data, safely perform reversible set/get operations, interpret returned results, and avoid unsafe operations.
-
-7. Output images such as `.png` files when data can be plotted, or a concise settings-summary artifact when plotting is not applicable.
-
-8. Optional `requirements-mvp-level-1.txt` only if the MVP genuinely needs a small additional Python package beyond the prepared core libraries. Do not create this for already installed core packages unless useful for reproducibility.
+7. Optional `requirements-mvp-level-1.txt` only if the MVP genuinely needs a small additional Python package beyond the prepared core libraries. Do not create this for already installed core packages unless useful for reproducibility.
 
 Do not use a single monolithic `mvp_level_1.py` script as the default architecture unless the user explicitly requests a single-file implementation or the runtime environment makes a package impractical. If backward compatibility with earlier pipeline naming is useful, optionally create a thin `mvp_level_1.py` wrapper that imports and runs `demo_of_efficacy.py`, but keep reusable device logic in the package.
 

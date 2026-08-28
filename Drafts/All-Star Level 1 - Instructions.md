@@ -78,7 +78,13 @@ Use MVP Level 1 as the primary architectural and behavioral model. Build on its 
 
 - any proven device-response parsing or normalization.
 
-Then expand toward the full Methods and Settings Plan. Implement as many planned safe methods/settings as can be responsibly supported from official documentation and upstream evidence. Be broad in coverage, and do not shy away from useful settings writes or method calls simply because earlier stages were read-focused. Safe, documented, reversible writes are valuable when they prove real device control, exercise the reusable package, support the scientist’s goals, and can be verified with readback or observable evidence. Favor broad coverage with clear guards and documented limitations over unsafe or speculative completeness.
+Then expand toward the full Methods and Settings Plan. Implement as many planned safe methods/settings as can be responsibly supported from official documentation and upstream evidence. Be broad in coverage, and do not shy away from useful, documented device writes. In most cases, a strong All-Star implementation is incomplete unless it includes both reads/queries and safe, documented, reversible write or method-call paths that prove the package can actually control the device, not merely observe it.
+
+Treat safe reversible write testing as a default proof target, not as an optional flourish. If the selected device exposes everyday, documented, low-risk set/get candidates, build restoration plans and test them live when the device is connected. A missing restoration plan is not a reason to avoid the write; it is a reason to make the plan by reading the current value, choosing a safe temporary value, setting it, reading it back, restoring the original value, and verifying restoration.
+
+Only omit live write testing when no safe, documented, reversible candidate exists; the relevant command is unavailable or undocumented; restoration is impossible or cannot be verified; the setting affects calibration, firmware, service state, persistent destructive behavior, hazardous output, motion, laser/radiation/energy emission, experiment-critical state, or device-bricking behavior; or the user or upstream safety context explicitly forbids it. In those cases, label the outcome partial or guarded and explain what would be needed to validate write capability later.
+
+Group the implementation into coherent capability areas such as:
 
 Group the implementation into coherent capability areas such as:
 
@@ -182,18 +188,37 @@ For each All-Star Level 1 implementation request:
    
    - If the implementation focuses on settings or configuration rather than plottable measurements, create a clear settings summary showing relevant readable settings, values, units, and status.
    
-   - For every safe set/get demonstration, capture and report: the value before setting, the exact package method or documented command/API call used to set the value, the requested set value, the readback after setting, whether the readback changed as expected, and the value after restoring the original setting.
+   - Before every live write or set/get demonstration, make a short restoration plan:
    
-   - Any setting changed solely to demonstrate efficacy must be restored to its original value before the demo exits, unless restoration is impossible or unsafe. If restoration fails, mark the result clearly and report the blocker or safety caveat.
+   - read the current value and record it as the restore target;
    
-   - Prefer reversible, low-risk settings for set/get demonstrations, and include those writes when they make the All-Star package more useful or prove real control capability. Avoid settings that affect calibration, firmware, service state, irreversible device state, device-bricking behavior, or experiment-critical state.
+   - choose a low-risk temporary value within documented limits, preferably near the current value or otherwise benign;
    
-   - Include plain-language notes that help a lab-domain reader understand what the returned values, plots, summaries, or readbacks mean scientifically or operationally.
+   - define the exact package method or documented command/API call that will set the value;
    
-   - When applicable, explain how a human can verify the result on the physical device UI or lab setup.
+   - define the readback or observable evidence that proves the set occurred;
    
-   - Separate success evidence into machine-readable results and human-readable artifacts. Do not rely only on terminal output when images, summaries, or before/after evidence would communicate success better.
+   - restore the original value before exit when safe and possible;
+   
+   - verify and record the restored value.
 
+  If you are tempted to say a write would alter the user's current setup, first attempt this restoration plan. Treat inability to make or verify a safe restoration plan as the blocker, not the mere fact that state would change temporarily.
+
+  For every safe set/get demonstration, capture and report: the value before setting, the exact package method or documented command/API call used to set the value, the requested set value, the readback after setting, whether the readback changed as expected, the restore command or method, and the value after restoring the original setting.
+
+- Any setting changed solely to demonstrate efficacy must be restored to its original value before the demo exits, unless restoration is impossible or unsafe. If restoration fails, mark the result clearly and report the blocker or safety caveat.
+
+- Prefer reversible, low-risk settings for set/get demonstrations, and include those writes when they make the All-Star package more useful or prove real control capability. Avoid settings that affect calibration, firmware, service state, irreversible device state, device-bricking behavior, or experiment-critical state.
+
+- Include plain-language notes that help a lab-domain reader understand what the returned values, plots, summaries, or readbacks mean scientifically or operationally.
+
+- When applicable, explain how a human can verify the result on the physical device UI or lab setup.
+
+- Separate success evidence into machine-readable results and human-readable artifacts. Do not rely only on terminal output when images, summaries, or before/after evidence would communicate success better.
+
+- Fake resources, mocks, simulators, and dry runs can validate code paths, but they do not prove live write capability. If only fake or simulated writes were tested, label live write validation as unproven and make the overall outcome partial unless the user explicitly asked for mock-only work.
+
+- If no live write was attempted, include a prominent caveat in the run summary and chat result: "Package write methods were not validated against the live device." Explain whether this was due to safety, missing documentation, missing connection, missing write candidate, or user constraints.
 8. **Execute, inspect, and iterate**
    
    - Run the demo script when the environment and connected device are available.
