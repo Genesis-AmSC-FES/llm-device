@@ -1,6 +1,6 @@
 # Device Pipeline Agent Guide
 
-> **AI authorship:** This file was written by OpenAI Codex (model/version/variant/mode unavailable in the creating runtime).
+> **AI authorship:** This file was written by OpenAI Codex (model/version/variant/mode unavailable in the creating runtime) and materially updated by OpenAI Codex (GPT-5; variant, size, reasoning profile, and mode unavailable in the current runtime).
 
 ## What this workspace is
 
@@ -103,6 +103,12 @@ Do not add an AI-authorship notice to official manuals, manufacturer downloads, 
 
 ## Conversation and hardware rules
 
+- Preserve relevant user conversations as stage evidence. Whenever the user provides a fact, preference, constraint, correction, acceptance, interpretation, data need, workflow need, or other perspective that is relevant to the stage being worked on, capture the relevant exchange verbatim in a human-readable Markdown transcript inside that stage's output folder. This applies to formal interviews, fact-finding conversations, answers to clarifying questions, unsolicited context, and requests to revise a stage to better fit the user's needs.
+- Name the transcript `conversation-transcript.md`. Maintain one cumulative transcript per stage and append exchanges in chronological order; do not overwrite earlier entries. If the active stage's instruction file explicitly requires a different transcript filename, follow that requirement and record the required filename in the stage handoff.
+- Start the transcript with the required AI-authorship notice. For each exchange, add a session or entry heading with the date and time when exposed by the runtime, followed by clear `User` and `Assistant` role labels. Copy the relevant messages exactly as sent, including wording, punctuation, and formatting; do not summarize, clean up, silently correct, or convert the user's statements into inferred facts. Include enough adjacent assistant and user messages to preserve the context and meaning of the exchange.
+- Capture the exchange during the turn in which it becomes relevant and before completing or materially relying on the affected stage artifact. If a conversation requests a correction to an earlier stage, append it to that earlier stage's transcript. If the same exchange materially informs more than one stage, include it in each affected stage's transcript and identify the other affected stage folders in a short note outside the verbatim text.
+- Do not fabricate or reconstruct verbatim dialogue that is no longer available in the conversation context. If a relevant earlier exchange cannot be retrieved exactly, state the gap in the transcript and ask the user to restate it when the missing wording matters. Never label a paraphrase as verbatim.
+- Treat transcripts as evidence of what the user said, not proof that a device fact is independently true. Carry the user-provided information into other artifacts with its provenance clearly labeled as a user statement, observation, preference, or acceptance as appropriate.
 - Stage 4 requires a focused conversation about the scientist’s goals and explicit acceptance of the interface decision before final accepted artifacts are created.
 - Stage 9 is collaborative: the user handles the physical device and the agent handles terminal checks.
 - During physical work, give only one or two small actions at a time and compare before/after evidence.
@@ -155,6 +161,7 @@ Only after that re-read and audit, confirm:
 
 - The stage objective was achieved, or the result is accurately marked partial/blocked.
 - Required user interaction or acceptance occurred.
+- Every relevant user exchange available in the conversation context was preserved verbatim in the affected stage's `conversation-transcript.md` (or the stage instruction's explicitly required alternative).
 - Required files exist in the correct numbered folder.
 - Structured artifacts validate.
 - Claims are supported by official sources or observed evidence.
