@@ -134,7 +134,7 @@ When implementation is needed:
 
 6. **Test as you go**
    
-   - Run static checks, unit tests, import tests, examples, and documentation build checks when possible.
+   - Run static checks, unit tests, import tests, examples, documentation build checks, and the verification harness described below when possible.
    
    - If hardware is unavailable, use simulated or mocked transports and clearly distinguish mock validation from real-device testing.
    
@@ -283,6 +283,62 @@ If prior agents already produced a package or partial library:
 - run the relevant tests after changes.
 
 If the existing package is too contaminated by mechanical instruction-following or is architecturally unsound, be liberal about rewriting it. Explain the rewrite at a high level, not as a defensive apology.
+
+## Mandatory Verification Harness
+
+Before declaring a device-library implementation complete, create a small, runnable verification harness beside the library or inside a clearly named verification folder. The harness must use the public package API, not private transport shortcuts, so it tests the same interface that scientists will use.
+
+Verification output is a first-class deliverable, not terminal noise. Each completed run should leave inspectable artifacts such as settings tables, CSV files, plots, images, position reports, logs, or result summaries that both the user and downstream pipeline steps can inspect.
+
+Create or update these verification materials when implementation proceeds:
+
+1. **Settings verification script**
+   
+   - Provide a script such as `scripts/verify_settings.sh` or an equivalent Python entry point with a shell wrapper.
+   
+   - Connect using the selected documented interface and stable discovery or connection criteria available from upstream context.
+   
+   - Query identity, firmware/version when available, connection/resource information, status/health, and the routine configurable state supported by the library.
+   
+   - Print a readable terminal table and save the same information to a timestamped human-readable file in an `output/` directory.
+
+2. **Primary data/control verification script**
+   
+   - Provide a script such as `scripts/verify_data_product.sh` or an equivalent Python entry point with a shell wrapper.
+   
+   - Exercise the smallest documented, low-risk operation that demonstrates the device’s primary data product or primary control path through the public API.
+   
+   - Save an inspectable artifact in `output/`, appropriate to the instrument: CSV plus plot for sensors, scopes, spectrometers, and time-series devices; PNG/TIFF/JPEG for cameras or image-producing devices; timestamped tables for environmental instruments; before/after position reports for motors and stages; or command/result logs for actuators without a data product.
+   
+   - Include device model, serial number when available, host timestamp, configuration summary, units, and provenance metadata where documented.
+   
+   - Do not present raw codes as calibrated physical units unless conversion is documented and validated.
+
+3. **Human verification README**
+   
+   - Provide `README-Human-Verification.md` or equivalent documentation with exact commands, prerequisites, expected safe behavior, output locations, known limitations, and a concise explanation of what each verification does and does not prove.
+
+Run the verification harness before handoff whenever the required hardware is visible and the operation is within the approved safety scope. For each script:
+
+1. Record any device state needed for restoration.
+
+2. Run the script through the public package API.
+
+3. Confirm expected output files exist, are non-empty, and are parseable or renderable.
+
+4. Inspect the output: parse CSV/JSON/tables, open or render plots/images, and check expected dimensions, point counts, metadata, timestamps, and units.
+
+5. Confirm temporary device settings were restored with a fresh device query.
+
+6. Save terminal output, test result summaries, and generated artifacts in `output/`.
+
+7. If any part fails, diagnose the cause, fix the library or script, rerun affected unit tests, then rerun the real-device verification. Do not declare completion while a generated verification script fails.
+
+A successful connection or identity query proves communication only. It does not prove the primary data path, control path, acquisition path, or routine settings workflow.
+
+For devices with visible or physically consequential behavior, such as motors, stages, relays, pumps, valves, shutters, heaters, lasers, high-voltage equipment, or similar hardware, use human-in-the-loop verification for physical motion or output unless that test is explicitly within the approved safety scope. Prepare one bounded, documented, reversible action at a time; explain expected visible behavior and restoration behavior; ask the user to observe or approve the action; capture the user’s observation verbatim; compare it with terminal/device feedback; and restore the prior state when applicable. Never treat a command-success response alone as proof that motion, output, or acquisition physically occurred.
+
+Do not mark the implementation complete until package installation/import succeeds, unit tests pass, applicable verification scripts pass, at least one relevant human-readable output artifact is saved and inspected, settings output is saved and inspectable, temporary state has been restored and verified, and real-device, mock-only, and human-observed evidence are clearly labeled. Document unresolved calibration, conversion, timing, safety, hardware, or performance gaps rather than hiding them.
 
 ## Evidence, Testing, And Safety
 
